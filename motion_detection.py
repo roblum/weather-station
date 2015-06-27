@@ -1,4 +1,5 @@
 import cv2
+import datetime
 
 
 class Camera():
@@ -13,6 +14,13 @@ class Camera():
 	def video_feed(self):
 		while self.video_active:
 			(self.grabbed, self.frame) = self.camera.read()
+			self.text = "No Motion Detected"
+
+			gray_frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
+			gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
+
+			if self.first_frame is None:
+				self.set_first_frame(gray_frame)				
 
 			self.on_video_capture_error()
 			self.display_video_feed()
@@ -21,9 +29,15 @@ class Camera():
 		self.camera.release()
 		cv2.destroyAllWindows()
 
+	def set_first_frame(self, gray_frame):
+		self.first_frame = gray_frame
+
 	def on_video_capture_error(self):
 		if not self.grabbed:
 			self.video_active = False
+
+	def reset_first_frame(self, gray_frame):
+		self.set_first_frame(gray_frame)
 
 	def display_video_feed(self):
 		cv2.imshow("Video Feed", self.frame)		
