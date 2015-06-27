@@ -14,11 +14,19 @@ class Camera():
 		while self.video_active:
 			(self.grabbed, self.frame) = self.camera.read()
 
+			self.on_video_capture_error()
 			self.display_video_feed()
 			self.exit_trigger()
 
+		self.camera.release()
+		cv2.destroyAllWindows()
+
+	def on_video_capture_error(self):
+		if not self.grabbed:
+			self.video_active = False
+
 	def display_video_feed(self):
-		cv2.imshow("Video Feed", self.frame)
+		cv2.imshow("Video Feed", self.frame)		
 
 	def exit_trigger(self):
 		if cv2.waitKey(1) & 0xFF == ord("q"):
