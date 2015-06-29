@@ -11,7 +11,7 @@ class Camera():
 	def video_feed(self, **kwargs):
 		self.set_video_state("Video Activated")
 		
-		while self.video_active:
+		while self.is_recording:
 			(self.grabbed, self.frame) = self.camera.read()
 			self.gray_frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
 			self.gray_frame = cv2.GaussianBlur(self.gray_frame, (21, 21), 0)
@@ -29,7 +29,7 @@ class Camera():
 			self.exit_trigger(self.gray_frame)
 
 	def detect_motion(self, **kwargs):
-		self.video_active = True
+		self.is_recording = True
 		self.video_feed(**kwargs)
 
 		if self.video_state is "Motion Detected":
@@ -51,11 +51,11 @@ class Camera():
 				(x, y, w, h) = cv2.boundingRect(c)
 				cv2.rectangle(self.frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 				self.set_video_state("Motion Detected")
-				self.video_active = False
+				self.is_recording = False
 
 	def display_video_text(self):
 		cv2.putText(self.frame, 
-			self.text, 
+			self.video_text, 
 			(10, 20), 
 			cv2.FONT_HERSHEY_SIMPLEX, 
 			0.5, 
@@ -71,9 +71,9 @@ class Camera():
 			1
 		)
 
-	def set_video_state(self, text):
-		self.video_state = text
-		self.text = text
+	def set_video_state(self, condition):
+		self.video_state = condition
+		self.video_text = condition
 
 	def set_base_frame(self, gray_frame):
 		self.base_frame = gray_frame
@@ -88,7 +88,7 @@ class Camera():
 		cv2.imshow("Video Feed", self.frame) # Last window shows on top	
 	
 	def kill_video(self):
-		self.video_active = False
+		self.is_recording = False
 		self.camera.release()
 		cv2.destroyAllWindows()
 
