@@ -1,5 +1,6 @@
 import cv2
 import datetime
+from settings import VIDEO_ACTIVATED, NO_MOTION_DETECTED, MOTION_DETECTED
 
 
 class Camera():
@@ -9,7 +10,7 @@ class Camera():
 		self.base_frame = None
 
 	def video_feed(self, **kwargs):
-		self.set_video_state("Video Activated")
+		self.set_video_state(VIDEO_ACTIVATED)
 		
 		while self.is_recording:
 			(self.grabbed, self.frame) = self.camera.read()
@@ -32,11 +33,11 @@ class Camera():
 		self.is_recording = True
 		self.video_feed(**kwargs)
 
-		if self.video_state is "Motion Detected":
+		if self.video_state is MOTION_DETECTED:
 			return self.video_state
 
 	def motion_detected(self):
-		self.set_video_state("No Motion Detected")
+		self.set_video_state(NO_MOTION_DETECTED)
 		self.frame_delta = cv2.absdiff(self.base_frame, self.gray_frame)
 		self.thresh = cv2.threshold(self.frame_delta, 25, 255, cv2.THRESH_BINARY)[1]
 		self.thresh = cv2.dilate(self.thresh, None, iterations=2)
@@ -50,7 +51,7 @@ class Camera():
 			if cv2.contourArea(c) < 500:
 				(x, y, w, h) = cv2.boundingRect(c)
 				cv2.rectangle(self.frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-				self.set_video_state("Motion Detected")
+				self.set_video_state(MOTION_DETECTED)
 				self.is_recording = False
 
 	def display_video_text(self):
@@ -95,4 +96,4 @@ class Camera():
 	def exit_trigger(self, gray_frame):
 		if cv2.waitKey(1) & 0xFF == ord("q"):
 			# self.kill_video()
-			self.set_base_frame(gray_frame)
+			self.set_base_frame(gray_frame) # reset first frame
