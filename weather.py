@@ -1,4 +1,6 @@
 import requests
+import json
+
 from keys import API_KEY #temp
 from settings import HOURLY, CONDITIONS
 
@@ -16,15 +18,45 @@ class Weather():
 			STATE, 
 			LOCATION
 		))
+
 		return response._content
 
-	def format_hourly(self):
-		response = self.make_request(condition=HOURLY)
+	def return_formatted_weather(self, amt_of_hours, type_of_forecast):
+		response = json.loads(self.make_request(condition=type_of_forecast))
 
-		return response
+		next_hours = []
+		for hour in xrange(amt_of_hours):
+			if response['hourly_forecast'][hour]:
+				next_hours.append(self.weather_factory(
+					response['hourly_forecast'][hour],
+					type_of_forecast
+				))
+		
+		# print '#### NEXT HOURS'
+		# print next_hours
+		return next_hours
 
-	def format_conditions(self):
-		response = self.make_request(condition=CONDITIONS)
+	# @staticmethod
+	def weather_factory(self, forecast, type_of_forecast):
+		# print '#### HOUR'
+		# print forecast
+		if type_of_forecast == 'hourly':
+			return self.hour_format(forecast)
 
-		return response
+	def hour_format(self, forecast):
+		# print hour
+		military_hour = int(forecast['FCTTIME']['hour']) #['hour']
+
+		if military_hour > 12:
+			military_hour = 12 - military_hour
+
+		conditions = {
+			'hour': military_hour,
+			'temperature': forecast['temp']['english'],
+			'precipitation': forecast['pop'],
+			'icon': forecast['icon'],
+			'icon_url': forecast['icon_url'],
+		}
+
+		return conditions
 
