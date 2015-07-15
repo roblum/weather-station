@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <div>
+        <input type="text" id="user-input" />
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        var connection = new WebSocket('ws://127.0.0.1:8000/weather_station');
+        connection.onopen = function(){
+            console.log('Connection open!');
+            connection.send('hello');
+        }
+
+        connection.onclose = function(){
+            alert('Connection closed');
+        }
+
+        connection.onerror = function(error){
+            console.log('Error detected: ' + error);
+        }
+
+        connection.onmessage = function(msg){
+            console.log(msg);
+        }
+
+        $('#user-input').on('change', function() {
+            console.log(this.value);
+            connection.send(this.value);
+        });
+    </script>
+</body>
+</html>
