@@ -1,4 +1,4 @@
-from camera import Camera
+from camera import CameraFeatures
 from weather import Weather
 from settings import MOTION_DETECTED, HOURLY, CONDITIONS
 
@@ -6,7 +6,7 @@ from settings import MOTION_DETECTED, HOURLY, CONDITIONS
 class WeatherStation():
 
 	def __init__(self):
-		self.camera = Camera()
+		self.camera = CameraFeatures()
 
 	def check_camera_motion(self):
 		report = self.camera.detect_motion()
