@@ -1,29 +1,30 @@
 import cv2
 import datetime
 
-from settings import VIDEO_ACTIVATED, NO_MOTION_DETECTED, MOTION_DETECTED
+from settings import CAMERA_ACTIVATED, NO_MOTION_DETECTED, MOTION_DETECTED
 
 
 class Camera():
 
 	def __init__(self):
 		self.camera = cv2.VideoCapture(0)
+		self.video_text = CAMERA_ACTIVATED
 
 	def capture_frame(self):
 		(self.curr_grabbed, self.curr_frame) = self.camera.read()
 		self.curr_gray_frame = cv2.cvtColor(self.curr_frame, cv2.COLOR_BGR2GRAY)
 		self.curr_gray_frame = cv2.GaussianBlur(self.curr_gray_frame, (21, 21), 0)
 	
-	def display_text_on_frame(self, video_text=VIDEO_ACTIVATED):
-		cv2.putText(self.curr_frame, 
-			video_text, 
+	def display_text_on_frame(self):
+		cv2.putText(self.curr_frame, # Show Feed State as video_text
+			self.video_text, 
 			(10, 20), 
 			cv2.FONT_HERSHEY_SIMPLEX, 
 			0.5, 
 			(0, 0, 255), 
 			2
 		)
-		cv2.putText(self.curr_frame, 
+		cv2.putText(self.curr_frame, # Show Timestamp
 			datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"), 
 			(10, self.curr_frame.shape[0] - 10), 
 			cv2.FONT_HERSHEY_SIMPLEX, 
@@ -44,7 +45,7 @@ class Camera():
 	def exit_trigger(self):
 		if cv2.waitKey(1) & 0xFF == ord("q"):
 			# self.kill_camera() # original kill switch
-			self.set_base_frame(self.curr_gray_frame) # reset first frame
+			self.base_frame = self.curr_gray_frame # reset first frame
 
 	def kill_camera(self):
 		self.is_recording = False
@@ -64,15 +65,20 @@ class CameraFeatures(Camera):
 			if self.base_frame is None:
 				self.base_frame = self.curr_gray_frame
 
-			if self.compare_frames() is False:
-				self.kill_camera()
-				return MOTION_DETECTED
+			self.compare_frames()
+			# if self.compare_frames() is False:
+				# self.kill_camera()
+				# return MOTION_DETECTED
 
+			self.display_text_on_frame()
 			self.display_frame_feed()
 			self.on_frame_capture_error()
+			self.exit_trigger()1340 for housing
+((295.17 + 295.17) - 255.34)
+335 per person
 	
 	def compare_frames(self):
-		self.display_text_on_frame(NO_MOTION_DETECTED)
+		self.video_text = NO_MOTION_DETECTED
 		self.frame_delta = cv2.absdiff(self.base_frame, self.curr_gray_frame)
 		self.thresh = cv2.threshold(self.frame_delta, 25, 255, cv2.THRESH_BINARY)[1]
 		self.thresh = cv2.dilate(self.thresh, None, iterations=2)
@@ -86,5 +92,5 @@ class CameraFeatures(Camera):
 			if cv2.contourArea(c) < 500:
 				(x, y, w, h) = cv2.boundingRect(c)
 				cv2.rectangle(self.curr_frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-				self.display_text_on_frame(MOTION_DETECTED)
+				self.video_text = MOTION_DETECTED
 				return False

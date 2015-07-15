@@ -1,7 +1,7 @@
 """
 Camera Settings
 """
-VIDEO_ACTIVATED = "Video Activated"
+CAMERA_ACTIVATED = "Camera Activated"
 NO_MOTION_DETECTED = "No Motion Detected"
 MOTION_DETECTED = "Motion Detected"
 
