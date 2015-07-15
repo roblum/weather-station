@@ -14,29 +14,29 @@ class Camera():
 		(self.curr_grabbed, self.curr_frame) = self.camera.read()
 		self.curr_gray_frame = cv2.cvtColor(self.curr_frame, cv2.COLOR_BGR2GRAY)
 		self.curr_gray_frame = cv2.GaussianBlur(self.curr_gray_frame, (21, 21), 0)
-	
+
 	def display_text_on_frame(self):
 		cv2.putText(self.curr_frame, # Show Feed State as video_text
-			self.video_text, 
-			(10, 20), 
-			cv2.FONT_HERSHEY_SIMPLEX, 
-			0.5, 
-			(0, 0, 255), 
+			self.video_text,
+			(10, 20),
+			cv2.FONT_HERSHEY_SIMPLEX,
+			0.5,
+			(0, 0, 255),
 			2
 		)
 		cv2.putText(self.curr_frame, # Show Timestamp
-			datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"), 
-			(10, self.curr_frame.shape[0] - 10), 
-			cv2.FONT_HERSHEY_SIMPLEX, 
-			0.35, 
-			(0, 0, 255), 
+			datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
+			(10, self.curr_frame.shape[0] - 10),
+			cv2.FONT_HERSHEY_SIMPLEX,
+			0.35,
+			(0, 0, 255),
 			1
 		)
 
 	def display_frame_feed(self):
 		# cv2.imshow("Thresh", self.thresh) # Only for detect_motion
 		# cv2.imshow("Frame Delta", self.frame_delta) # Only for detect_motion
-		cv2.imshow("Video Feed", self.curr_frame) # Last window shows on top	
+		cv2.imshow("Video Feed", self.curr_frame) # Last window shows on top
 
 	def on_frame_capture_error(self):
 		if not self.curr_grabbed:
@@ -73,18 +73,16 @@ class CameraFeatures(Camera):
 			self.display_text_on_frame()
 			self.display_frame_feed()
 			self.on_frame_capture_error()
-			self.exit_trigger()1340 for housing
-((295.17 + 295.17) - 255.34)
-335 per person
-	
+			self.exit_trigger()
+
 	def compare_frames(self):
 		self.video_text = NO_MOTION_DETECTED
 		self.frame_delta = cv2.absdiff(self.base_frame, self.curr_gray_frame)
 		self.thresh = cv2.threshold(self.frame_delta, 25, 255, cv2.THRESH_BINARY)[1]
 		self.thresh = cv2.dilate(self.thresh, None, iterations=2)
 		(cnts, _) = cv2.findContours(
-			self.thresh.copy(), 
-			cv2.RETR_EXTERNAL, 
+			self.thresh.copy(),
+			cv2.RETR_EXTERNAL,
 			cv2.CHAIN_APPROX_SIMPLE
 		)
 
