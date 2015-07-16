@@ -44,8 +44,7 @@ class Camera():
 
 	def exit_trigger(self):
 		if cv2.waitKey(1) & 0xFF == ord("q"):
-			# self.kill_camera() # original kill switch
-			self.base_frame = self.curr_gray_frame # reset first frame
+			self.kill_camera() # kill switch
 
 	def kill_camera(self):
 		self.is_recording = False
@@ -56,24 +55,27 @@ class Camera():
 class CameraFeatures(Camera):
 
 	def detect_motion(self):
-		self.base_frame = None
 		self.is_recording = True
+		self.set_base_frame(None)
 
 		while self.is_recording:
 			self.capture_frame()
 
 			if self.base_frame is None:
-				self.base_frame = self.curr_gray_frame
+				self.set_base_frame(self.curr_gray_frame)
 
-			self.compare_frames()
+			self.detect_face()
 			# if self.compare_frames() is False:
-				# self.kill_camera()
-				# return MOTION_DETECTED
+			# 	self.kill_camera()
+			# 	return MOTION_DETECTED
 
 			self.display_text_on_frame()
 			self.display_frame_feed()
 			self.on_frame_capture_error()
 			self.exit_trigger()
+
+	def set_base_frame(self, gray_frame):
+		self.base_frame = gray_frame
 
 	def compare_frames(self):
 		self.video_text = NO_MOTION_DETECTED
@@ -92,3 +94,20 @@ class CameraFeatures(Camera):
 				cv2.rectangle(self.curr_frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 				self.video_text = MOTION_DETECTED
 				return False
+
+	def detect_face(self):
+		faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+
+		faces = faceCascade.detectMultiScale(
+		    self.curr_gray_frame,
+		    scaleFactor=1.1,
+		    minNeighbors=5,
+		    minSize=(30, 30),
+		    flags = cv2.cv.CV_HAAR_SCALE_IMAGE
+		)
+
+		print "Found {0} faces!".format(len(faces))
+
+		# Draw a rectangle around the faces
+		for (x, y, w, h) in faces:
+		    cv2.rectangle(self.curr_frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
