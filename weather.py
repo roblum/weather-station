@@ -9,7 +9,7 @@ STATE = "NY"
 LOCATION = "New_York"
 
 
-class Weather():
+class WeatherApi():
 
 	def make_request(self, **kwargs):
 		response = requests.get(BASE_URL.format(
@@ -32,19 +32,15 @@ class Weather():
 					type_of_forecast
 				))
 		
-		# print '#### NEXT HOURS'
-		# print next_hours
 		return next_hours
 
-	# @staticmethod
 	def weather_factory(self, forecast, type_of_forecast):
-		# print '#### HOUR'
-		# print forecast
-		if type_of_forecast == 'hourly':
+		if type_of_forecast is HOURLY:
 			return self.hour_format(forecast)
+		# elif type_of_forecast is CONDITIONS:
+		# 	return self.conditions_format(forecast)
 
 	def hour_format(self, forecast):
-		# print hour
 		military_hour = int(forecast['FCTTIME']['hour']) #['hour']
 
 		if military_hour > 12:
@@ -59,4 +55,3 @@ class Weather():
 		}
 
 		return conditions
-

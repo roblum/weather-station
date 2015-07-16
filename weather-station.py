@@ -1,5 +1,5 @@
 from camera import CameraFeatures
-from weather import Weather
+from weather import WeatherApi
 from settings import MOTION_DETECTED, HOURLY, CONDITIONS
 
 
@@ -16,7 +16,7 @@ class WeatherStation():
 
 	def get_weather_conditions(self):
 		if self.check_camera_motion():
-			weather = Weather()
+			weather = WeatherApi()
 			response = weather.return_formatted_weather(5, HOURLY)
 
 			print response
