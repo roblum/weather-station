@@ -12,6 +12,7 @@ Weather Settings
 HOURLY = "hourly"
 CONDITIONS = "conditions"
 
+
 """
 Location Settings
 """

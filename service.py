@@ -6,7 +6,10 @@ sockets = Sockets(app)
 
 @sockets.route('/weather_station')
 def weather_station(ws):
-    while True:
-        message = ws.receive()
+	while True:
+		message = ws.receive()
 
-        ws.send(message)
+		if not message is None:
+			ws.send(message)
+		else:
+			return
