@@ -64,10 +64,9 @@ class CameraFeatures(Camera):
 			if self.base_frame is None:
 				self.set_base_frame(self.curr_gray_frame)
 
-			self.detect_face()
-			# if self.compare_frames() is False:
-			# 	self.kill_camera()
-			# 	return MOTION_DETECTED
+			if self.compare_frames() is False:
+				self.kill_camera()
+				return MOTION_DETECTED
 
 			self.display_text_on_frame()
 			self.display_frame_feed()
@@ -96,18 +95,33 @@ class CameraFeatures(Camera):
 				return False
 
 	def detect_face(self):
-		faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+		self.is_recording = True
 
-		faces = faceCascade.detectMultiScale(
-		    self.curr_gray_frame,
-		    scaleFactor=1.1,
-		    minNeighbors=5,
-		    minSize=(30, 30),
-		    flags = cv2.cv.CV_HAAR_SCALE_IMAGE
-		)
+		while self.is_recording:
+			self.capture_frame()
+			face_cascade = cv2.CascadeClassifier('./trainer/haarcascade_frontalface_default.xml')
 
-		print "Found {0} faces!".format(len(faces))
+			faces = face_cascade.detectMultiScale(
+			    self.curr_gray_frame,
+			    scaleFactor=1.1,
+			    minNeighbors=5,
+			    minSize=(30, 30),
+			    flags = cv2.cv.CV_HAAR_SCALE_IMAGE
+			)
+			
+			print '#### FACES'
+			print faces
 
-		# Draw a rectangle around the faces
-		for (x, y, w, h) in faces:
-		    cv2.rectangle(self.curr_frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+			# Draw a rectangle around the faces
+			for (x, y, w, h) in faces:
+			    cv2.rectangle(self.curr_frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
+			self.display_text_on_frame()
+			self.display_frame_feed()
+			self.on_frame_capture_error()
+			self.exit_trigger()
+
+			print "Found {0} faces!".format(len(faces))
+			# if len(faces) >= 1:
+				# self.kill_camera()
+				# return MOTION_DETECTED

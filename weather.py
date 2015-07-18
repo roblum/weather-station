@@ -2,17 +2,20 @@ import requests
 import json
 
 from keys import API_KEY #temp
-from settings import HOURLY, CONDITIONS
-
-BASE_URL = "http://api.wunderground.com/api/{0}/{1}/q/{2}/{3}.json"
-STATE = "NY"
-LOCATION = "New_York"
+from settings import (
+	HOURLY, 
+	CONDITIONS, 
+	STATE, 
+	LOCATION
+)
 
 
 class WeatherApi():
 
-	def make_request(self, **kwargs):
-		response = requests.get(BASE_URL.format(
+	BASE_URL = "http://api.wunderground.com/api/{0}/{1}/q/{2}/{3}.json"
+
+	def fetch_api_data(self, **kwargs):
+		response = requests.get(self.BASE_URL.format(
 			API_KEY, 
 			kwargs.get('condition', CONDITIONS), 
 			STATE, 
@@ -22,7 +25,7 @@ class WeatherApi():
 		return response._content
 
 	def return_formatted_weather(self, amt_of_hours, type_of_forecast):
-		response = json.loads(self.make_request(condition=type_of_forecast))
+		response = json.loads(self.fetch_api_data(condition=type_of_forecast))
 
 		next_hours = []
 		for hour in xrange(amt_of_hours):

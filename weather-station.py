@@ -9,10 +9,8 @@ class WeatherStation():
 		self.camera = CameraFeatures()
 
 	def check_camera_motion(self):
-		report = self.camera.detect_motion()
-
-		if report is MOTION_DETECTED:
-			return True
+		# return self.camera.detect_motion()
+		return self.camera.detect_face()
 
 	def get_weather_conditions(self):
 		if self.check_camera_motion():

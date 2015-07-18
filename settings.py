@@ -11,3 +11,9 @@ Weather Settings
 """
 HOURLY = "hourly"
 CONDITIONS = "conditions"
+
+"""
+Location Settings
+"""
+STATE = "NY"
+LOCATION = "New_York"
